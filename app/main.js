@@ -1,20 +1,27 @@
+//tells getUserMedia to only allow audio and ask for audio permission
 let constraintsObj ={
     audio: true,
     video: false
 }
+//checks for various APIs in safari and mozzila (i think)
 if(navigator.mediaDevices === undefined){
     navigator.mediaDevices = {}
     navigator.mediaDevices.getUserMedia = (constraints)=>{
         let getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+        //if the browser has no media api
         if(!getUserMedia){
+            //return error
             return Promise.reject(new Error('getUserMedia is not implemented in this browser'))
         }
         return new Promise(()=>{
+            //in any other case, return this
             getUserMedia.call(navigator,constraints,resolve,reject)
         })
     }
 }
+//if the default browser api exists and is reachable
 else{
+    //show the devices available for input and output
     navigator.mediaDevices.enumerateDevices()
         .then(devices=>{
             devices.forEach(device=>{
@@ -28,24 +35,30 @@ else{
 const rec = document.getElementById('recordingAndDuration')
 navigator.mediaDevices.getUserMedia(constraintsObj)
     .then((mediaStreamObj)=>{
+        //look for audio elements in the html 
         let audio = document.querySelector('audio')
+        //modern version, get the media object as a source for the audio
         if('srcObject' in audio){
             audio.srcObject = mediaStreamObj
         }
+        //same thing, just with URLs instead of objects
         else{
             audio.src = window.URL.createObjectURL(mediaStreamObj)
         }
-
+        //plays the audio as it is being recorded, not really necessary (would've used audio1 in html)
         audio.onloadedmetadata = (ev) =>{
             audio.play();
         }
-
+        //grab the buttons and the audio element to which we save the data
         let start = document.getElementById('startRec')
         let stop = document.getElementById('stopRec')
         let audioSave = document.getElementById('audio2')
+        //instantiate media recorder with the mediaStreamObj we get as a promise form .getUserMedia
         let mediaRecorder = new MediaRecorder(mediaStreamObj)
+        //the data gets sent as chunks, much like file reading
         let audioChunks = []
         
+        //function to log the length of a recording as the audio element doesn't to that very well
         let i=0
         let curr
         function updateUi(){
@@ -58,7 +71,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             },1000)
         }
         
-
+        //self explanatory ----------------------------------------------------------------
         start.addEventListener('click',(ev)=>{
             mediaRecorder.start()
             console.log(mediaRecorder.state)
@@ -69,13 +82,18 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             console.log(mediaRecorder.state)
             rec.innerText = `Rec... | Duration: ${curr} seconds`
         })
+        //---------------------------------------------------------------------------------
+        //as soon as something is recorded, push it to the array
         mediaRecorder.ondataavailable = (ev)=>{
             audioChunks.push(ev.data)
         }
+        //when recording is finished, make a media storage blob of mp3 type with the data from the array
+        //enables downloading of the audiofile
         mediaRecorder.onstop = (ev) =>{
             let blob = new Blob(audioChunks, {'type':'audio/mp3;'})
             audioChunks = []
             let audioUrl = window.URL.createObjectURL(blob)
+            //when saving, redirect to the blob
             audioSave.src = audioUrl;
         }
         updateUi()
@@ -84,7 +102,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
     .catch((err)=>{
         console.log(err.name, err.message)
     })
-
+//this hides the audio1 audio element, could probably be removed alltogether
 let audio1 = document.getElementById('audio1')
 audio1.muted = true
 audio1.hidden = true;
