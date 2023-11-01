@@ -78,7 +78,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         track.connect(gainNode).connect(panner).connect(audioCtx.destination)
         //-------------------------------------
 
-        //function to log the length of a recording as the audio element doesn't to that very well
+        //function to log the length of a recording as the audio element doesn't do that very well
         let i=0
         let curr
         function updateUi(){
