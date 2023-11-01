@@ -12,8 +12,17 @@
         <div class="buttons">
             <button id = "startRec">START</button>
             <button id = "stopRec">STOP</button>
+            <button id="playPause"data-playing="false" role="switch" aria-checked="false">
+                <span>Play/Pause</span>
+            </button>
         </div>
-        <p id="recordingAndDuration">Rec: ... | Duration: 0 seconds</p>
+        <p id="recordingAndDuration">Stand-by | Duration: 0 seconds</p>
+        <div class="info">
+            <p id="vol" class="margin">Volume</p>
+            <input class="margin"id="volumeBar"type="range" min="0" max="2" value="1" step="0.01" />
+            <p id="pan"class="margin">Panner (Left/Stereo/Right)</p>
+            <input class="margin"id="pannerBar"type='range' min="0" max="2" value="1" step="0.01"/>
+        </div>
         <div class="audioBoxes">
             <audio id="audio1" controls></audio>
             <audio id="audio2" controls></audio>
