@@ -156,5 +156,5 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
     .catch((err)=>{
         console.log(err.name, err.message)
     })
-//this hides the audio1 audio element, could probably be removed alltogether
+//this hides the audio1 audio element as deleting it breaks everything
 document.getElementById('audio1').hidden = true
