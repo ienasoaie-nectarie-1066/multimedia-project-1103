@@ -46,9 +46,9 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             audio.src = window.URL.createObjectURL(mediaStreamObj)
         }
         //plays the audio as it is being recorded, not really necessary (would've used audio1 in html)
-        audio.onloadedmetadata = (ev) =>{
+        /*audio.onloadedmetadata = (ev) =>{
             audio.play();
-        }
+        }*/
         //grab the buttons and the audio element to which we save the data
         let start = document.getElementById('startRec')
         let stop = document.getElementById('stopRec')
@@ -57,7 +57,27 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         let mediaRecorder = new MediaRecorder(mediaStreamObj)
         //the data gets sent as chunks, much like file reading
         let audioChunks = []
-        
+
+
+        //Web Audio API SETUP
+        const AudioContext = window.AudioContext || window.webkitAudioContext
+        const audioCtx = new AudioContext();
+        //-------------------
+
+        //NODES
+        //gainNode is used to control gain (volume)
+        const gainNode = audioCtx.createGain()
+        //stereo panner (mono-left; stereo; mono-right)
+        const pannerOptions = { pan:0 }
+        const panner = new StereoPannerNode(audioCtx, pannerOptions)
+        //-----
+
+        //CONNECTION FROM SOURCE TO DESTINATION
+        const track = audioCtx.createMediaElementSource(audioSave)
+        //connect source and additional nodes to the destination (src = track / dest = argument for connect)
+        track.connect(gainNode).connect(panner).connect(audioCtx.destination)
+        //-------------------------------------
+
         //function to log the length of a recording as the audio element doesn't to that very well
         let i=0
         let curr
@@ -67,6 +87,9 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
                     rec.innerText = `Rec... | Duration: ${i} seconds`
                     i++
                     curr = i
+                }
+                else{
+                    rec.innerText = `Stand-by | Duration: ${i} seconds`
                 }
             },1000)
         }
@@ -97,12 +120,41 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             audioSave.src = audioUrl;
         }
         updateUi()
+
+        //Play/Pause btn functionality
+        let pp = document.getElementById('playPause')
+        pp.addEventListener('click',()=>{
+            if(audioCtx.state === 'suspended'){
+                audioCtx.resume()
+            }
+            if(pp.dataset.playing === 'false'){
+                audioSave.play()
+                pp.dataset.playing = 'true'
+            }
+            else if(pp.dataset.playing === 'true'){
+                audioSave.pause()
+                pp.dataset.playing ='false'
+            }
+        },false)
+
+        audioSave.addEventListener('ended',()=>{
+            pp.dataset.playing = 'false'
+        }, false)
         
+        //Volume bar functionality
+        const vBar = document.getElementById('volumeBar')
+        vBar.addEventListener('input',()=>{
+            gainNode.gain.value = vBar.value
+        },false)
+
+        //Panner bar functionality
+        const pBar = document.getElementById('pannerBar')
+        pBar.addEventListener('input',()=>{
+            panner.pan.value = pBar.value
+        },false)
     })  
     .catch((err)=>{
         console.log(err.name, err.message)
     })
 //this hides the audio1 audio element, could probably be removed alltogether
-let audio1 = document.getElementById('audio1')
-audio1.muted = true
-audio1.hidden = true;
+document.getElementById('audio1').hidden = true
