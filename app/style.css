@@ -11,20 +11,34 @@
   .buttons {
     padding: 7px 20px;
     cursor: pointer;
+    border-style: solid;
+    border-width: 3px;
+    border-color:blue;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    width: 300px;
+    margin:auto;
+    background-color:aqua;
   }
   .audioBoxes{
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 5px;
   }
   .info{
+    border-style: solid;
+    border-width: 3px;
+    border-color:blue;
+    border-radius: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     width: 300px;
     margin:auto;
-    background-color: coral;
+    background-color:aqua;
   }
   .margin{
     margin:3px;
