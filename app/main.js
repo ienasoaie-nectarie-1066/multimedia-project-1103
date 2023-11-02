@@ -58,7 +58,6 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //the data gets sent as chunks, much like file reading
         let audioChunks = []
 
-
         //Web Audio API SETUP
         const AudioContext = window.AudioContext || window.webkitAudioContext
         const audioCtx = new AudioContext();
