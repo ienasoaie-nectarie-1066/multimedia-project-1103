@@ -78,7 +78,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         track.connect(gainNode).connect(panner).connect(audioCtx.destination)
         //-------------------------------------
 
-        //function to log the length of a recording as the audio element doesn't to that very well
+        //function to log the length of a recording as the audio element doesn't do that very well
         let i=0
         let curr
         function updateUi(){
@@ -156,5 +156,5 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
     .catch((err)=>{
         console.log(err.name, err.message)
     })
-//this hides the audio1 audio element, could probably be removed alltogether
+//this hides the audio1 audio element as deleting it breaks everything
 document.getElementById('audio1').hidden = true
