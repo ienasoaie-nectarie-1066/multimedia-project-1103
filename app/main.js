@@ -123,7 +123,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //CONNECTION FROM SOURCE TO DESTINATION
         const track = audioCtx.createMediaElementSource(audioSave)
         //connect source and additional nodes to the destination (src = track / dest = argument for connect)
-        track.connect(analyser).connect(gainNode).connect(panner).connect(audioCtx.destination)
+        track.connect(gainNode).connect(panner).connect(analyser).connect(audioCtx.destination)
         //-------------------------------------
 
         //function to log the length of a recording as the audio element doesn't do that very well
