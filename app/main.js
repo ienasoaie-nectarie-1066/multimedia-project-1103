@@ -78,7 +78,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
                 analyser.getByteTimeDomainData(dataArray)
                 canvasCtx.beginPath()
                 for(let x = 0; x < bufferSize; x++){
-                    let y = 255-dataArray[x];
+                    let y = 299-dataArray[x];
                     canvasCtx.lineTo(x, y);
                   }
                   canvasCtx.closePath();
