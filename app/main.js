@@ -63,18 +63,67 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         const audioCtx = new AudioContext();
         //-------------------
 
+        //Canvas API SETUP & drawing function
+        const canvas = document.getElementById('canvas')
+        const canvasCtx = canvas.getContext('2d')
+        function startDrawing(){
+            analyser.fftSize = 1024
+            let bufferSize = analyser.frequencyBinCount
+            let dataArray = new Uint8Array(bufferSize)
+            canvasCtx.lineWidth = 2
+            function draw(){
+                canvasCtx.clearRect(0,0,canvas.width, canvas.height)
+                requestAnimationFrame(draw)
+
+                analyser.getByteTimeDomainData(dataArray)
+                canvasCtx.beginPath()
+                for(let x = 0; x < bufferSize; x++){
+                    let y = 255-dataArray[x];
+                    canvasCtx.lineTo(x, y);
+                  }
+                  canvasCtx.closePath();
+                  canvasCtx.stroke();
+            }
+            draw()
+        }
         //NODES
         //gainNode is used to control gain (volume)
         const gainNode = audioCtx.createGain()
         //stereo panner (mono-left; stereo; mono-right)
         const pannerOptions = { pan:0 }
         const panner = new StereoPannerNode(audioCtx, pannerOptions)
+        //analyzer
+        const analyser = audioCtx.createAnalyser()
+        analyser.smoothingTimeConstant = 0.9
+        //filters
+        //biquad
+        /*const biquadOptions = {
+            type: 'lowshelf',
+            frequency:{value: 1000},
+            gain:{value:25}
+        }
+        const biquadFilter = new BiquadFilterNode(audioCtx, biquadOptions)*/
+        //no clue if this works
+        //reverb w/ all the fancy tricks
+        /*function base64ToArrayBuffer(base64) {
+            var binaryString = window.atob(base64);
+            var len = binaryString.length;
+            var bytes = new Uint8Array(len);
+            for (var i = 0; i < len; i++)        {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+        const reverbNode = audioCtx.createConvolver()
+        audioCtx.decodeAudioData(track,(buffer)=>{
+            reverbNode.buffer = buffer
+        })*/
         //-----
 
         //CONNECTION FROM SOURCE TO DESTINATION
         const track = audioCtx.createMediaElementSource(audioSave)
         //connect source and additional nodes to the destination (src = track / dest = argument for connect)
-        track.connect(gainNode).connect(panner).connect(audioCtx.destination)
+        track.connect(analyser).connect(gainNode).connect(panner).connect(audioCtx.destination)
         //-------------------------------------
 
         //function to log the length of a recording as the audio element doesn't do that very well
@@ -96,6 +145,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //self explanatory ----------------------------------------------------------------
         start.addEventListener('click',(ev)=>{
             mediaRecorder.start()
+            startDrawing()
             console.log(mediaRecorder.state)
             i=0
         })
@@ -129,6 +179,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             if(pp.dataset.playing === 'false'){
                 audioSave.play()
                 pp.dataset.playing = 'true'
+                startDrawing()
             }
             else if(pp.dataset.playing === 'true'){
                 audioSave.pause()
