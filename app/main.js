@@ -148,13 +148,16 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //self explanatory ----------------------------------------------------------------
         start.addEventListener('click',(ev)=>{
             mediaRecorder.start()
-            startDrawing()
             console.log(mediaRecorder.state)
+            //v this prevents a DOM Exception
+            start.disabled=true
             i=0
         })
         stop.addEventListener('click',(ev)=>{
             mediaRecorder.stop()
             console.log(mediaRecorder.state)
+            //v re-enables start button for another recording
+            start.disabled=false
             rec.innerText = `Rec... | Duration: ${curr} seconds`
         })
         //---------------------------------------------------------------------------------
