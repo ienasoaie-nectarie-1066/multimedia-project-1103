@@ -66,11 +66,17 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //Canvas API SETUP & drawing function
         const canvas = document.getElementById('canvas')
         const canvasCtx = canvas.getContext('2d')
+        const gradient = canvasCtx.createLinearGradient(0,0,canvas.width,0)
+        gradient.addColorStop(0,'#0000A3')
+        gradient.addColorStop(1/3,'#004197')
+        gradient.addColorStop(2/3,'#7F3E71')
+        gradient.addColorStop(1,'#DF265E')
         function startDrawing(){
             analyser.fftSize = 1024
             let bufferSize = analyser.frequencyBinCount
             let dataArray = new Uint8Array(bufferSize)
-            canvasCtx.lineWidth = 2
+            canvasCtx.strokeStyle = gradient
+            canvasCtx.lineWidth = 5
             function draw(){
                 canvasCtx.clearRect(0,0,canvas.width, canvas.height)
                 requestAnimationFrame(draw)
