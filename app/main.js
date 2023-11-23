@@ -76,7 +76,7 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
             let bufferSize = analyser.frequencyBinCount
             let dataArray = new Uint8Array(bufferSize)
             canvasCtx.strokeStyle = gradient
-            canvasCtx.lineWidth = 5
+            canvasCtx.lineWidth = 2
             function draw(){
                 canvasCtx.clearRect(0,0,canvas.width, canvas.height)
                 requestAnimationFrame(draw)
@@ -101,6 +101,22 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         //analyzer
         const analyser = audioCtx.createAnalyser()
         analyser.smoothingTimeConstant = 0.9
+        //distort
+        const distort = audioCtx.createWaveShaper()
+        function makeDistortionCurve(amount) {
+            var k = typeof amount === 'number' ? amount : 50,
+              n_samples = 44100,
+              curve = new Float32Array(n_samples),
+              deg = Math.PI / 180,
+              i = 0,
+              x;
+            for ( ; i < n_samples; ++i ) {
+              x = i * 2 / n_samples - 1;
+              curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+            }
+            return curve;
+          };
+        distort.oversample='4x'
         //filters
         //biquad
         /*const biquadOptions = {
@@ -130,7 +146,8 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         const track = audioCtx.createMediaElementSource(audioSave)
         //connect source and additional nodes to the destination (src = track / dest = argument for connect)
         track.connect(gainNode)//.connect(panner).connect(analyser).connect(audioCtx.destination)
-        gainNode.connect(panner)
+        distort.connect(panner)
+        gainNode.connect(distort)
         panner.connect(analyser)
         analyser.connect(audioCtx.destination)
         //-------------------------------------
@@ -213,6 +230,14 @@ navigator.mediaDevices.getUserMedia(constraintsObj)
         const pBar = document.getElementById('pannerBar')
         pBar.addEventListener('input',()=>{
             panner.pan.value = pBar.value
+        },false)
+
+        //Distortion bar func
+        const dBar = document.getElementById('distBar')
+        distort.curve = makeDistortionCurve(0)
+        dBar.addEventListener('input',()=>{
+            distort.curve = makeDistortionCurve(parseInt(dBar.value))
+            console.log(dBar.value)
         },false)
     })  
     .catch((err)=>{
