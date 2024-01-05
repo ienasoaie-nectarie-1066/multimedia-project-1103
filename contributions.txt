@@ -1,0 +1,6 @@
+Ienasoaie Nectarie:
+- Media recording API code & implementation, media processing, buttons, attempts at biquad filter
+Cosma Andrei: 
+- Canvas API, Distortion node
+Gereg Andrei: 
+- The rest of the audio nodes, CSS styling, recording timer
